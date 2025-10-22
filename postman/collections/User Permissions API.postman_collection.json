@@ -480,6 +480,23 @@
           "body": "[{\"permission\":\"admin\",\"granted\":true}]"
         }
       ]
+    },
+    {
+      "name": "Delete Users",
+      "request": {
+        "method": "DELETE",
+        "url": {
+          "raw": "http://localhost:4000/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "users"
+          ]
+        }
+      }
     }
   ],
   "variable": [
