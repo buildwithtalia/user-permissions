@@ -1,0 +1,491 @@
+{
+  "info": {
+    "_postman_id": "a6caef8e-9a68-4e10-bcc8-c3372431b705",
+    "name": "User Permissions API",
+    "description": "# User Permissions API\n\n## Overview\nThe User Permissions API provides endpoints to manage users and their permissions within your application. It allows you to list users, retrieve and update their permissions, and manage available permission types. This API is ideal for applications that require fine-grained access control and user management.\n\n## Base URL\n```\n{{baseUrl}}\n```\nSet the `baseUrl` variable in your Postman environment or collection variables to point to your API server (e.g., `https://api.example.com`).\n\n## Authentication\nThis API typically requires authentication (e.g., Bearer token or API key) to access protected endpoints. Add the appropriate `Authorization` header to your requests:\n```\nAuthorization: Bearer <your_token>\n```\n_If your implementation differs, update the authentication method accordingly._\n\n## Endpoints\n\n### 1. List Users\n- **Endpoint:** `GET /users`\n- **Description:** Retrieves a list of all users.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/users\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"id\": 1, \"name\": \"Alice\", \"email\": \"alice@example.com\"},\n    {\"id\": 2, \"name\": \"Bob\", \"email\": \"bob@example.com\"}\n  ]\n  ```\n\n### 2. Get User Permissions\n- **Endpoint:** `GET /users/{userId}/permissions`\n- **Description:** Retrieves the permissions assigned to a specific user.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/users/1/permissions\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": false}\n  ]\n  ```\n\n### 3. Update User Permissions\n- **Endpoint:** `PUT /users/{userId}/permissions`\n- **Description:** Updates the permissions for a specific user. Provide an array of permission objects.\n- **Request Example:**\n  ```http\n  PUT {{baseUrl}}/users/1/permissions\n  Content-Type: application/json\n\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": true}\n  ]\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": true}\n  ]\n  ```\n\n### 4. List Permissions\n- **Endpoint:** `GET /permissions`\n- **Description:** Lists all available permission types in the system.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/permissions\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\"},\n    {\"permission\": \"write\"},\n    {\"permission\": \"admin\"}\n  ]\n  ```\n\n### 5. Grant User Permission\n- **Endpoint:** `POST /users/{userId}/permissions`\n- **Description:** Grants a specific permission to a user. Provide the permission object in the request body.\n- **Request Example:**\n  ```http\n  POST {{baseUrl}}/users/2/permissions\n  Content-Type: application/json\n\n  {\"permission\": \"admin\", \"granted\": true}\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"admin\", \"granted\": true}\n  ]\n  ```\n\n## Error Handling\n- **400 Bad Request:** Invalid input or missing required fields.\n- **401 Unauthorized:** Authentication failed or missing credentials.\n- **403 Forbidden:** Insufficient permissions to perform the operation.\n- **404 Not Found:** Resource does not exist (e.g., user or permission not found).\n- **500 Internal Server Error:** Unexpected server error.\n\nError responses typically include a JSON object with an `error` or `message` field describing the issue:\n```json\n{\n  \"error\": \"Invalid user ID.\"\n}\n```\n\n## Additional Notes\n- All endpoints return JSON responses.\n- Ensure you set the `baseUrl` variable before making requests.\n- For further details, refer to individual request documentation and examples in this collection.\n",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "List Users",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// List Users - GET /users",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array of users\", function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(Array.isArray(json)).to.be.true;",
+              "});",
+              "",
+              "pm.test(\"Each user has id, name, and email\", function () {",
+              "    const json = pm.response.json();",
+              "    json.forEach(user => {",
+              "        pm.expect(user).to.have.property(\"id\");",
+              "        pm.expect(user).to.have.property(\"name\");",
+              "        pm.expect(user).to.have.property(\"email\");",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Handles 4xx/5xx errors with error/message field\", function () {",
+              "    if (pm.response.code >= 400) {",
+              "        let body;",
+              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
+              "        pm.expect(body).to.be.an(\"object\");",
+              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:4000/users",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "users"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Example User List",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "_postman_previewtype": "html",
+          "body": "[{\"id\":1,\"name\":\"Alice\",\"email\":\"alice@example.com\"},{\"id\":2,\"name\":\"Bob\",\"email\":\"bob@example.com\"}]"
+        }
+      ]
+    },
+    {
+      "name": "Get User Permissions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Get User Permissions - GET /users/:userId/permissions",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array of permissions\", function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(Array.isArray(json)).to.be.true;",
+              "});",
+              "",
+              "pm.test(\"Each permission object has 'permission' and 'granted'\", function () {",
+              "    const json = pm.response.json();",
+              "    json.forEach(p => {",
+              "        pm.expect(p).to.have.property(\"permission\");",
+              "        pm.expect(p).to.have.property(\"granted\");",
+              "        pm.expect(p.granted).to.be.a(\"boolean\");",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Handles 4xx/5xx errors with error/message field\", function () {",
+              "    if (pm.response.code >= 400) {",
+              "        let body;",
+              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
+              "        pm.expect(body).to.be.an(\"object\");",
+              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:4000/users/1/permissions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "users",
+            "1",
+            "permissions"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Sample User Permissions",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users/1/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "permissions"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "_postman_previewtype": "html",
+          "body": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":false}]"
+        }
+      ]
+    },
+    {
+      "name": "Update User Permissions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Update User Permissions - PUT /users/:userId/permissions",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array of permissions\", function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(Array.isArray(json)).to.be.true;",
+              "});",
+              "",
+              "pm.test(\"Each permission object has 'permission' and 'granted'\", function () {",
+              "    const json = pm.response.json();",
+              "    json.forEach(p => {",
+              "        pm.expect(p).to.have.property(\"permission\");",
+              "        pm.expect(p).to.have.property(\"granted\");",
+              "        pm.expect(p.granted).to.be.a(\"boolean\");",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Handles 4xx/5xx errors with error/message field\", function () {",
+              "    if (pm.response.code >= 400) {",
+              "        let body;",
+              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
+              "        pm.expect(body).to.be.an(\"object\");",
+              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
+        },
+        "url": {
+          "raw": "http://localhost:4000/users/1/permissions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "users",
+            "1",
+            "permissions"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Permissions Updated",
+          "originalRequest": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/1/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "1",
+                "permissions"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "_postman_previewtype": "html",
+          "body": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
+        }
+      ]
+    },
+    {
+      "name": "List Permissions",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// List Permissions - GET /permissions",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array of permissions\", function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(Array.isArray(json)).to.be.true;",
+              "});",
+              "",
+              "pm.test(\"Each permission object has 'permission'\", function () {",
+              "    const json = pm.response.json();",
+              "    json.forEach(p => {",
+              "        pm.expect(p).to.have.property(\"permission\");",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Handles 4xx/5xx errors with error/message field\", function () {",
+              "    if (pm.response.code >= 400) {",
+              "        let body;",
+              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
+              "        pm.expect(body).to.be.an(\"object\");",
+              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:4000/permissions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "permissions"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Permission Types",
+          "originalRequest": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "permissions"
+              ]
+            }
+          },
+          "status": "OK",
+          "code": 200,
+          "_postman_previewlanguage": "json",
+          "_postman_previewtype": "html",
+          "body": "[{\"permission\":\"read\"},{\"permission\":\"write\"},{\"permission\":\"admin\"}]"
+        }
+      ]
+    },
+    {
+      "name": "Grant User Permission",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "// Grant User Permission - POST /users/:userId/permissions",
+              "pm.test(\"Status code is 200\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test(\"Response is an array of permissions\", function () {",
+              "    const json = pm.response.json();",
+              "    pm.expect(Array.isArray(json)).to.be.true;",
+              "});",
+              "",
+              "pm.test(\"Each permission object has 'permission' and 'granted'\", function () {",
+              "    const json = pm.response.json();",
+              "    json.forEach(p => {",
+              "        pm.expect(p).to.have.property(\"permission\");",
+              "        pm.expect(p).to.have.property(\"granted\");",
+              "        pm.expect(p.granted).to.be.a(\"boolean\");",
+              "    });",
+              "});",
+              "",
+              "pm.test(\"Handles 4xx/5xx errors with error/message field\", function () {",
+              "    if (pm.response.code >= 400) {",
+              "        let body;",
+              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
+              "        pm.expect(body).to.be.an(\"object\");",
+              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"permission\":\"admin\",\"granted\":true}"
+        },
+        "url": {
+          "raw": "http://localhost:4000/users/2/permissions",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "4000",
+          "path": [
+            "users",
+            "2",
+            "permissions"
+          ]
+        }
+      },
+      "response": [
+        {
+          "name": "Permission Granted",
+          "originalRequest": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"permission\":\"admin\",\"granted\":true}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/2/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                "2",
+                "permissions"
+              ]
+            }
+          },
+          "status": "Created",
+          "code": 201,
+          "_postman_previewlanguage": "json",
+          "_postman_previewtype": "html",
+          "body": "[{\"permission\":\"admin\",\"granted\":true}]"
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.example.com"
+    }
+  ]
+}
