@@ -3,9 +3,7 @@
     "id": "0a5cb4fa-88e4-4c75-9463-27f7956de426"
   },
   "entities": {
-    "collections": [
-      "../postman/collections/User Permissions API.postman_collection.json"
-    ],
+    "collections": [],
     "environments": [],
     "specs": [],
     "flows": []
