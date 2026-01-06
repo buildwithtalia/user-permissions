@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  api-tests:
+  run-collection:
     name: Run Postman API Tests
     runs-on: ubuntu-latest
 
@@ -50,10 +50,16 @@ jobs:
         run: |
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
+      - name: Verify Postman CLI version
+        run: postman --version
+
+      - name: Login to Postman CLI
+        run: postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+
       - name: Create results directory
         run: mkdir -p newman
 
-      - name: Run Postman collection tests
+      - name: Run Postman Collection
         continue-on-error: true
         run: |
           echo "🧪 Running Postman collection tests..."
