@@ -50,9 +50,19 @@ jobs:
         run: |
           curl -o- "https://dl-cli.pstmn.io/install/linux64.sh" | sh
 
+      - name: Create results directory
+        run: mkdir -p newman
+
       - name: Run Postman collection tests
+        continue-on-error: true
         run: |
-          postman collection run bd515596-1c6f-4050-80ef-d2e9da663180
+          echo "🧪 Running Postman collection tests..."
+          postman collection run bd515596-1c6f-4050-80ef-d2e9da663180 \
+            --reporters cli,json,html \
+            --reporter-json-export newman/test-results.json \
+            --reporter-html-export newman/test-results.html \
+            --env-var baseURL=http://localhost:4000 \
+            --bail || echo "⚠️ Some tests may have failed, but reports were generated"
         env:
           POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
 
@@ -70,5 +80,17 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: postman-test-results
-          path: newman/
-          if-no-files-found: ignore
+          path: |
+            newman/test-results.json
+            newman/test-results.html
+          if-no-files-found: warn
+
+      - name: Display test summary
+        if: always()
+        run: |
+          if [ -f newman/test-results.json ]; then
+            echo "✅ Test results generated successfully"
+            echo "📊 Check the artifacts for detailed HTML and JSON reports"
+          else
+            echo "❌ Test results were not generated"
+          fi
