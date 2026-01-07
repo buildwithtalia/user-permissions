@@ -101,37 +101,5 @@ jobs:
             echo "❌ Test results were not generated"
           fi
 
-      - name: Run API Spec Linting
-        if: always()
-        run: |
-          echo "🔍 Looking for OpenAPI/Swagger specification files..."
-          
-          # Install Spectral CLI for linting
-          npm install -g @stoplight/spectral-cli
-          
-          # Find spec files in common locations
-          SPEC_FILES=$(find . -type f \( -path "*/spec/*.yaml" -o -path "*/spec/*.yml" -o -path "*/spec/*.json" -o -path "*/openapi/*.yaml" -o -path "*/openapi/*.yml" -o -path "*/openapi/*.json" -o -name "openapi.yaml" -o -name "openapi.yml" -o -name "openapi.json" -o -name "swagger.yaml" -o -name "swagger.yml" -o -name "swagger.json" \) 2>/dev/null)
-          
-          if [ -z "$SPEC_FILES" ]; then
-            echo "⚠️ No OpenAPI/Swagger specification files found"
-            exit 0
-          fi
-          
-          echo "📄 Found specification files:"
-          echo "$SPEC_FILES"
-          
-          # Run Spectral linting on each spec file
-          EXIT_CODE=0
-          for spec in $SPEC_FILES; do
-            echo ""
-            echo "🔎 Linting: $spec"
-            spectral lint "$spec" --ruleset spectral:oas || EXIT_CODE=$?
-          done
-          
-          if [ $EXIT_CODE -eq 0 ]; then
-            echo "✅ All specification files passed linting"
-          else
-            echo "⚠️ Some specification files have linting issues"
-          fi
-          
-          exit $EXIT_CODE
+      - name: Run Spec Linting
+        run: postman spec lint 86be5286-e1c7-4a09-a3ae-6e26150ee806
