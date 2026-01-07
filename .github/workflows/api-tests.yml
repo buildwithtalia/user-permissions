@@ -102,4 +102,9 @@ jobs:
           fi
 
       - name: Run Spec Linting
-        run: postman spec lint 86be5286-e1c7-4a09-a3ae-6e26150ee806
+        run: |
+          echo "🔍 Running API specification linting..."
+          postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
+          postman spec lint "./postman/specs/User Permissions API.yaml" --workspace-id 0a5cb4fa-88e4-4c75-9463-27f7956de426 --fail-severity warning
+        env:
+          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
