@@ -1,0 +1,504 @@
+openapi: 3.0.3
+info:
+  title: User Permissions API
+  description: |
+    ## Overview
+    The User Permissions API provides endpoints to manage users and their permissions within your application. It allows you to list users, retrieve and update their permissions, and manage available permission types. This API is ideal for applications that require fine-grained access control and user management.
+
+    ## Authentication
+    This API typically requires authentication (e.g., Bearer token or API key) to access protected endpoints. Add the appropriate `Authorization` header to your requests:
+    ```
+    Authorization: Bearer <your_token>
+    ```
+
+    ## Error Handling
+    - **400 Bad Request:** Invalid input or missing required fields.
+    - **401 Unauthorized:** Authentication failed or missing credentials.
+    - **403 Forbidden:** Insufficient permissions to perform the operation.
+    - **404 Not Found:** Resource does not exist (e.g., user or permission not found).
+    - **500 Internal Server Error:** Unexpected server error.
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:4000
+    description: Local development server
+
+tags:
+  - name: Users
+    description: User management operations
+  - name: Permissions
+    description: Permission management operations
+
+paths:
+  /users:
+    get:
+      tags:
+        - Users
+      summary: List Users
+      description: Retrieves a list of all users in the system.
+      operationId: listUsers
+      responses:
+        '200':
+          description: Successful response with list of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              example:
+                - id: 1
+                  name: Alice
+                  email: alice@example.com
+                - id: 2
+                  name: Bob
+                  email: bob@example.com
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Users
+      summary: Create New User
+      description: Creates a new user with the specified details and permissions.
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+            example:
+              id: 3
+              name: Charlie
+              email: charlie@example.com
+              permissions:
+                - permission: read
+                  granted: true
+                - permission: write
+                  granted: true
+                - permission: delete
+                  granted: false
+                - permission: admin
+                  granted: false
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '200':
+          description: User created successfully (alternative response)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Bad Request - Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{userId}/permissions:
+    get:
+      tags:
+        - Users
+        - Permissions
+      summary: Get User Permissions
+      description: Retrieves the permissions assigned to a specific user.
+      operationId: getUserPermissions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The unique identifier of the user
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Successful response with user permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserPermission'
+              example:
+                - permission: read
+                  granted: true
+                - permission: write
+                  granted: false
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions to perform the operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - User does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      tags:
+        - Users
+        - Permissions
+      summary: Update User Permissions
+      description: Updates the permissions for a specific user. Provide an array of permission objects.
+      operationId: updateUserPermissions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user whose permissions to update
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/UserPermission'
+            example:
+              - permission: read
+                granted: true
+              - permission: write
+                granted: true
+      responses:
+        '200':
+          description: Permissions updated successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserPermission'
+              example:
+                - permission: read
+                  granted: true
+                - permission: write
+                  granted: true
+        '400':
+          description: Bad Request - Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions to perform the operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - User does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Users
+        - Permissions
+      summary: Grant User Permission
+      description: Grants a specific permission to a user. Provide the permission object in the request body.
+      operationId: grantUserPermission
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The unique identifier of the user
+          schema:
+            type: integer
+          example: 2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPermission'
+            example:
+              permission: admin
+              granted: true
+      responses:
+        '201':
+          description: Permission granted successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserPermission'
+              example:
+                - permission: admin
+                  granted: true
+        '400':
+          description: Bad Request - Invalid input or missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions to perform the operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - User does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{user_id}:
+    delete:
+      tags:
+        - Users
+      summary: Delete User
+      description: Deletes a user from the system.
+      operationId: deleteUser
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          description: The ID of the user to delete
+          schema:
+            type: integer
+          example: 2
+      responses:
+        '204':
+          description: User deleted successfully (no content)
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Insufficient permissions to perform the operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Not Found - User does not exist
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /permissions:
+    get:
+      tags:
+        - Permissions
+      summary: List Permissions
+      description: Lists all available permission types in the system.
+      operationId: listPermissions
+      responses:
+        '200':
+          description: Successful response with list of available permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Permission'
+              example:
+                - permission: read
+                - permission: write
+                - permission: admin
+        '401':
+          description: Unauthorized - Authentication failed or missing credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the user
+          example: 1
+        name:
+          type: string
+          description: Full name of the user
+          example: Alice
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+          example: alice@example.com
+
+    CreateUserRequest:
+      type: object
+      required:
+        - id
+        - name
+        - email
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the user
+          example: 3
+        name:
+          type: string
+          description: Full name of the user
+          example: Charlie
+        email:
+          type: string
+          format: email
+          description: Email address of the user
+          example: charlie@example.com
+        permissions:
+          type: array
+          description: Initial permissions to assign to the user
+          items:
+            $ref: '#/components/schemas/UserPermission'
+
+    Permission:
+      type: object
+      required:
+        - permission
+      properties:
+        permission:
+          type: string
+          description: Name of the permission
+          example: read
+          enum:
+            - read
+            - write
+            - admin
+            - delete
+
+    UserPermission:
+      type: object
+      required:
+        - permission
+        - granted
+      properties:
+        permission:
+          type: string
+          description: Name of the permission
+          example: read
+        granted:
+          type: boolean
+          description: Whether the permission is granted to the user
+          example: true
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: Invalid user ID.
+        message:
+          type: string
+          description: Alternative error message field
+          example: Resource not found
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT Bearer token authentication
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key authentication
+
+security:
+  - bearerAuth: []
+  - apiKey: []
