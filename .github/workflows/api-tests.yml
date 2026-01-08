@@ -72,6 +72,9 @@ jobs:
         env:
           POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
 
+      - name: Lint API Specification
+        run: postman spec lint "postman/specs/User Permissions API.yaml"
+
       - name: Stop backend server
         if: always()
         working-directory: backend
