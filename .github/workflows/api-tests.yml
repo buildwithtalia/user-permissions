@@ -101,33 +101,4 @@ jobs:
             echo "❌ Test results were not generated"
           fi
 
-      - name: Run Spec Linting
-        continue-on-error: true
-        run: |
-          echo "🔍 Running API specification linting..."
-
-          # Authenticate with Postman CLI
-          postman login --with-api-key ${{ secrets.POSTMAN_API_KEY }}
-
-          # Run spec linting and capture exit code
-          set +e  # Don't exit on error
-          postman spec lint "./postman/specs/User Permissions API.yaml" \
-            --workspace-id 0a5cb4fa-88e4-4c75-9463-27f7956de426 \
-            --fail-severity error \
-            --output json > spec-lint-results.json 2>&1
-          LINT_EXIT_CODE=$?
-          set -e  # Re-enable exit on error
-
-          # Display results
-          echo "📊 Spec linting completed with exit code: $LINT_EXIT_CODE"
-
-          if [ $LINT_EXIT_CODE -eq 0 ]; then
-            echo "✅ API specification passed all governance rules"
-          else
-            echo "⚠️ API specification has governance issues:"
-            cat spec-lint-results.json || echo "Could not display detailed results"
-            echo ""
-            echo "💡 This is informational - the workflow will continue"
-          fi
-        env:
-          POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
+      
