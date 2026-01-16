@@ -1664,14 +1664,39 @@
   ],
   "variable": [
     {
-      "id": "027cf31f-8d8a-4cbd-8c78-d100bfdc6db7",
+      "id": "20f69125-cdb0-44fe-b4ee-ee1a259d7285",
       "key": "baseURL",
       "value": "http://localhost:4000"
     },
     {
-      "id": "3dab6120-9368-4cb9-b3a1-f4418ed04961",
+      "id": "8ee3f82b-e164-447c-b202-cd2d42b881c9",
       "key": "user_id",
       "value": "1"
+    },
+    {
+      "id": "34c5ce3a-b60c-4a6c-9a73-6eab9ce5faaf",
+      "key": "randomUserId",
+      "value": ""
+    },
+    {
+      "id": "bee1638c-a17d-4006-b3f8-c57fe2186b31",
+      "key": "randomUserName",
+      "value": ""
+    },
+    {
+      "id": "ad2076ac-e191-4beb-be82-f75e491d8032",
+      "key": "randomUserFirstName",
+      "value": ""
+    },
+    {
+      "id": "47761dfb-acf7-4d50-9581-336d9190ad25",
+      "key": "randomUserLastName",
+      "value": ""
+    },
+    {
+      "id": "203d835e-8bb9-4956-ba6f-7e76f61d5124",
+      "key": "randomUserEmail",
+      "value": ""
     }
   ]
 }
