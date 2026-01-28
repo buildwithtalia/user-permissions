@@ -2,613 +2,110 @@
   "info": {
     "_postman_id": "bd515596-1c6f-4050-80ef-d2e9da663180",
     "name": "User Permissions API",
-    "description": "# User Permissions API\n\n## Overview\nThe User Permissions API provides endpoints to manage users and their permissions within your application. It allows you to list users, retrieve and update their permissions, and manage available permission types. This API is ideal for applications that require fine-grained access control and user management.\n\n## Base URL\n```\n{{baseUrl}}\n```\nSet the `baseUrl` variable in your Postman environment or collection variables to point to your API server (e.g., `https://api.example.com`).\n\n## Authentication\nThis API typically requires authentication (e.g., Bearer token or API key) to access protected endpoints. Add the appropriate `Authorization` header to your requests:\n```\nAuthorization: Bearer <your_token>\n```\n_If your implementation differs, update the authentication method accordingly._\n\n## Endpoints\n\n### 1. List Users\n- **Endpoint:** `GET /users`\n- **Description:** Retrieves a list of all users.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/users\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"id\": 1, \"name\": \"Alice\", \"email\": \"alice@example.com\"},\n    {\"id\": 2, \"name\": \"Bob\", \"email\": \"bob@example.com\"}\n  ]\n  ```\n\n### 2. Get User Permissions\n- **Endpoint:** `GET /users/{userId}/permissions`\n- **Description:** Retrieves the permissions assigned to a specific user.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/users/1/permissions\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": false}\n  ]\n  ```\n\n### 3. Update User Permissions\n- **Endpoint:** `PUT /users/{userId}/permissions`\n- **Description:** Updates the permissions for a specific user. Provide an array of permission objects.\n- **Request Example:**\n  ```http\n  PUT {{baseUrl}}/users/1/permissions\n  Content-Type: application/json\n\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": true}\n  ]\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": true}\n  ]\n  ```\n\n### 4. List Permissions\n- **Endpoint:** `GET /permissions`\n- **Description:** Lists all available permission types in the system.\n- **Request Example:**\n  ```http\n  GET {{baseUrl}}/permissions\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"read\"},\n    {\"permission\": \"write\"},\n    {\"permission\": \"admin\"}\n  ]\n  ```\n\n### 5. Grant User Permission\n- **Endpoint:** `POST /users/{userId}/permissions`\n- **Description:** Grants a specific permission to a user. Provide the permission object in the request body.\n- **Request Example:**\n  ```http\n  POST {{baseUrl}}/users/2/permissions\n  Content-Type: application/json\n\n  {\"permission\": \"admin\", \"granted\": true}\n  ```\n- **Response Example:**\n  ```json\n  [\n    {\"permission\": \"admin\", \"granted\": true}\n  ]\n  ```\n\n## Error Handling\n- **400 Bad Request:** Invalid input or missing required fields.\n- **401 Unauthorized:** Authentication failed or missing credentials.\n- **403 Forbidden:** Insufficient permissions to perform the operation.\n- **404 Not Found:** Resource does not exist (e.g., user or permission not found).\n- **500 Internal Server Error:** Unexpected server error.\n\nError responses typically include a JSON object with an `error` or `message` field describing the issue:\n```json\n{\n  \"error\": \"Invalid user ID.\"\n}\n```\n\n## Additional Notes\n- All endpoints return JSON responses.\n- Ensure you set the `baseUrl` variable before making requests.\n- For further details, refer to individual request documentation and examples in this collection.\n",
+    "description": "API for managing user permissions and access control",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "List Users",
-      "event": [
+      "name": "Users",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "id": "2a2c39aa-365b-4c21-94e5-ead21d2ab3c7",
-            "exec": [
-              "// ============================================",
-              "// List Users - GET /users",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 for successful request\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 304]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests ---",
-              "pm.test(\"Response is an array of users\", function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(Array.isArray(json)).to.be.true;",
-              "});",
-              "",
-              "pm.test(\"Response array is not empty (if 200)\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const json = pm.response.json();",
-              "        pm.expect(json.length).to.be.greaterThan(0);",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Each user has required properties: id, name, email\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"id\");",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"name\");",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"email\");",
-              "    });",
-              "});",
-              "",
-              "// --- Data Type Tests ---",
-              "pm.test(\"User id is a number or string\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(typeof user.id, `User id at index ${index}`).to.be.oneOf([\"number\", \"string\"]);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"User name is a non-empty string\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user.name, `User name at index ${index}`).to.be.a(\"string\");",
-              "        pm.expect(user.name.trim().length, `User name at index ${index}`).to.be.greaterThan(0);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"User email is a valid email format\", function () {",
-              "    const json = pm.response.json();",
-              "    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user.email, `User email at index ${index}`).to.be.a(\"string\");",
-              "        pm.expect(user.email, `User email at index ${index}`).to.match(emailRegex);",
-              "    });",
-              "});",
-              "",
-              "// --- Business Logic Tests ---",
-              "pm.test(\"All user IDs are unique\", function () {",
-              "    const json = pm.response.json();",
-              "    const ids = json.map(user => user.id);",
-              "    const uniqueIds = [...new Set(ids)];",
-              "    pm.expect(ids.length).to.equal(uniqueIds.length);",
-              "});",
-              "",
-              "pm.test(\"All user emails are unique\", function () {",
-              "    const json = pm.response.json();",
-              "    const emails = json.map(user => user.email.toLowerCase());",
-              "    const uniqueEmails = [...new Set(emails)];",
-              "    pm.expect(emails.length).to.equal(uniqueEmails.length);",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "        pm.expect(responseText).to.not.include(\"internal server\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not contain sensitive user data\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"password\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"passwordHash\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"secret\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"token\");",
-              "    });",
-              "});",
-              "",
-              "// --- Workflow: Extract and save user_id for chaining ---",
-              "if (pm.response.code === 200) {",
-              "    const json = pm.response.json();",
-              "    let userId = null;",
-              "    ",
-              "    if (Array.isArray(json) && json.length > 0) {",
-              "        userId = json[0].id;",
-              "    } else if (json && json.users && Array.isArray(json.users) && json.users.length > 0) {",
-              "        userId = json.users[0].id;",
-              "    } else if (json && json.id) {",
-              "        userId = json.id;",
-              "    }",
-              "    ",
-              "    if (userId !== null && userId !== undefined) {",
-              "        pm.collectionVariables.set(\"user_id\", userId);",
-              "        console.log(\"Saved user_id to collection variable:\", userId);",
-              "    } else {",
-              "        console.warn(\"Could not extract user_id from response\");",
-              "    }",
-              "}"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "id": "14d131a4-2690-4b11-9606-7a2a2205a905",
-            "exec": [
-              "// ============================================",
-              "// List Users - Pre-request Script",
-              "// Generate Dynamic Random User Data",
-              "// ============================================",
-              "",
-              "// Generate random user ID",
-              "const randomId = pm.variables.replaceIn('{{$randomInt}}');",
-              "",
-              "// Generate random name using first and last name",
-              "const randomFirstName = pm.variables.replaceIn('{{$randomFirstName}}');",
-              "const randomLastName = pm.variables.replaceIn('{{$randomLastName}}');",
-              "const randomFullName = randomFirstName + ' ' + randomLastName;",
-              "",
-              "// Generate random email",
-              "const randomEmail = pm.variables.replaceIn('{{$randomEmail}}');",
-              "",
-              "// Store values in collection variables for use in request/response",
-              "pm.collectionVariables.set('randomUserId', randomId);",
-              "pm.collectionVariables.set('randomUserName', randomFullName);",
-              "pm.collectionVariables.set('randomUserFirstName', randomFirstName);",
-              "pm.collectionVariables.set('randomUserLastName', randomLastName);",
-              "pm.collectionVariables.set('randomUserEmail', randomEmail);",
-              "",
-              "// Log generated values for debugging",
-              "console.log('Generated Random User Data:');",
-              "console.log('  ID:', randomId);",
-              "console.log('  Name:', randomFullName);",
-              "console.log('  Email:', randomEmail);"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "id": "c36f6790-2c4c-44dd-b926-e805020272e6",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseURL}}/users",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users"
-          ]
-        }
-      },
-      "response": [
-        {
-          "id": "d3d2f8b7-9f5b-4304-8dbd-5bdbcbf13c1e",
-          "name": "Example User List",
-          "originalRequest": {
+          "name": "List all users",
+          "id": "3330d95c-5e3a-4269-a79a-726726bbbf0d",
+          "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/users?limit=20&offset=0",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Maximum number of items to return (1-100, default: 20)"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip for pagination (default: 0)"
+                }
               ]
-            }
+            },
+            "description": "Retrieve a paginated list of all users in the system"
           },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"id\":1,\"name\":\"Alice\",\"email\":\"alice@example.com\"},{\"id\":2,\"name\":\"Bob\",\"email\":\"bob@example.com\"}]"
-        }
-      ]
-    },
-    {
-      "name": "Get User Permissions",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "7e155480-04f2-4aac-964a-f5d55c1fafe5",
-            "exec": [
-              "// ============================================",
-              "// Get User Permissions - GET /users/:user_id/permissions",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 for successful request\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 304, 404]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests (for successful responses) ---",
-              "if (pm.response.code === 200) {",
-              "    pm.test(\"Response is an array of permissions\", function () {",
-              "        const json = pm.response.json();",
-              "        pm.expect(Array.isArray(json)).to.be.true;",
-              "    });",
-              "",
-              "    pm.test(\"Each permission is a string\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.be.a(\"string\");",
-              "        });",
-              "    });",
-              "",
-              "    // --- Data Type Tests ---",
-              "    pm.test(\"Permission name is a non-empty string\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission name at index ${index}`).to.be.a(\"string\");",
-              "            pm.expect(perm.trim().length, `Permission name at index ${index}`).to.be.greaterThan(0);",
-              "        });",
-              "    });",
-              "",
-              "    pm.test(\"Permissions array is not empty\", function () {",
-              "        const json = pm.response.json();",
-              "        pm.expect(json.length).to.be.greaterThan(0);",
-              "    });",
-              "",
-              "    // --- Business Logic Tests ---",
-              "    pm.test(\"Permission names are unique for this user\", function () {",
-              "        const json = pm.response.json();",
-              "        const permNames = json.map(p => p.toLowerCase());",
-              "        const uniqueNames = [...new Set(permNames)];",
-              "        pm.expect(permNames.length).to.equal(uniqueNames.length);",
-              "    });",
-              "",
-              "    pm.test(\"Permission names are valid (alphanumeric with underscores/hyphens)\", function () {",
-              "        const json = pm.response.json();",
-              "        const validPermissionRegex = /^[a-z0-9_-]+$/i;",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.match(validPermissionRegex);",
-              "        });",
-              "    });",
-              "}",
-              "",
-              "// --- 404 Not Found Tests ---",
-              "pm.test(\"404 response for non-existent user has proper structure\", function () {",
-              "    if (pm.response.code === 404) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not expose other users' data\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"userId\");",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"user_id\");",
-              "        });",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
+          "response": []
         },
         {
-          "listen": "prerequest",
-          "script": {
-            "id": "19946b3c-9780-4ec3-a692-4b89d87c319b",
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "id": "d0d5b92f-a157-4076-a273-7cd7be31e61d",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseURL}}/users/{{user_id}}/permissions",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users",
-            "{{user_id}}",
-            "permissions"
-          ]
-        }
-      },
-      "response": [
-        {
-          "id": "7dded541-98c0-46d8-9810-8d78ade5bb1c",
-          "name": "Sample User Permissions",
-          "originalRequest": {
-            "method": "GET",
+          "name": "Delete a user",
+          "id": "7e513679-0524-43f8-b133-698b155709c8",
+          "request": {
+            "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/1/permissions",
+              "raw": "{{baseUrl}}/users/:user_id",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users",
-                "1",
-                "permissions"
+                ":user_id"
+              ],
+              "variable": [
+                {
+                  "key": "user_id",
+                  "value": "10",
+                  "description": "Unique identifier of the user"
+                }
               ]
-            }
+            },
+            "description": "Remove a user from the system"
           },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":false}]"
-        }
-      ]
-    },
-    {
-      "name": "Update User Permissions",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "f35e1b77-cd87-4700-aaa6-b1f125852c6d",
-            "exec": [
-              "// ============================================",
-              "// Update User Permissions - PUT /users/:userId/permissions",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 for successful update\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 400, 404, 422]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests (for successful responses) ---",
-              "if (pm.response.code === 200) {",
-              "    pm.test(\"Response is an array of permissions\", function () {",
-              "        const json = pm.response.json();",
-              "        pm.expect(Array.isArray(json)).to.be.true;",
-              "    });",
-              "",
-              "    pm.test(\"Each permission is a string\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.be.a(\"string\");",
-              "        });",
-              "    });",
-              "",
-              "    // --- Data Type Tests ---",
-              "    pm.test(\"Permission name is a non-empty string\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission name at index ${index}`).to.be.a(\"string\");",
-              "            pm.expect(perm.trim().length, `Permission name at index ${index}`).to.be.greaterThan(0);",
-              "        });",
-              "    });",
-              "",
-              "    pm.test(\"Permissions array is not empty\", function () {",
-              "        const json = pm.response.json();",
-              "        pm.expect(json.length).to.be.greaterThan(0);",
-              "    });",
-              "",
-              "    // --- Business Logic Tests ---",
-              "    pm.test(\"Response reflects the updated permissions from request\", function () {",
-              "        const json = pm.response.json();",
-              "        let requestBody;",
-              "        try { requestBody = JSON.parse(pm.request.body.raw); } catch (e) { requestBody = []; }",
-              "        if (Array.isArray(requestBody) && requestBody.length > 0) {",
-              "            const requestPermNames = requestBody.map(p => p.permission);",
-              "            // Response is array of strings, so compare directly",
-              "            requestPermNames.forEach(name => {",
-              "                pm.expect(json).to.include(name);",
-              "            });",
-              "        }",
-              "    });",
-              "",
-              "    pm.test(\"Permission names are unique in response\", function () {",
-              "        const json = pm.response.json();",
-              "        const permNames = json.map(p => p.toLowerCase());",
-              "        const uniqueNames = [...new Set(permNames)];",
-              "        pm.expect(permNames.length).to.equal(uniqueNames.length);",
-              "    });",
-              "}",
-              "",
-              "// --- 400 Bad Request Tests ---",
-              "pm.test(\"400 response for invalid input has proper structure\", function () {",
-              "    if (pm.response.code === 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- 404 Not Found Tests ---",
-              "pm.test(\"404 response for non-existent user has proper structure\", function () {",
-              "    if (pm.response.code === 404) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not expose internal user data\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"userId\");",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"internalId\");",
-              "        });",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "id": "fa4695aa-a5bf-46d4-9b88-e6595d9cf764",
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
+          "response": []
         }
       ],
-      "id": "064dcb96-31c1-45a9-aca1-75a344de354a",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
-        },
-        "url": {
-          "raw": "{{baseURL}}/users/:userId/permissions",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users",
-            ":userId",
-            "permissions"
-          ],
-          "variable": [
-            {
-              "key": "userId",
-              "value": "1",
-              "description": "The ID of the user whose permissions to update"
-            }
-          ]
-        }
-      },
-      "response": [
+      "id": "b703c0a3-62e7-4a48-8d89-19cef0cd67fb",
+      "description": "User management operations"
+    },
+    {
+      "name": "User Permissions",
+      "item": [
         {
-          "id": "66c5dc51-c86b-4015-84c1-77383a8b3494",
-          "name": "Permissions Updated",
-          "originalRequest": {
+          "name": "Get user permissions",
+          "id": "49146026-3215-4002-b47d-9c7e54479e44",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/:userId/permissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "users",
+                ":userId",
+                "permissions"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3",
+                  "description": "Unique identifier of the user"
+                }
+              ]
+            },
+            "description": "Retrieve all permissions assigned to a specific user"
+          },
+          "response": []
+        },
+        {
+          "name": "Update user permissions",
+          "id": "1446bf67-7dea-4aa0-b76f-cf8501e0feb2",
+          "request": {
             "method": "PUT",
             "header": [
               {
@@ -618,401 +115,34 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
+              "raw": "[\n  {\"permission\": \"read\", \"granted\": true},\n  {\"permission\": \"write\", \"granted\": true},\n  {\"permission\": \"delete\", \"granted\": false},\n  {\"permission\": \"admin\", \"granted\": false}\n]"
             },
             "url": {
-              "raw": "{{baseUrl}}/users/1/permissions",
+              "raw": "{{baseUrl}}/users/:userId/permissions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users",
-                "1",
+                ":userId",
                 "permissions"
-              ]
-            }
-          },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"permission\":\"read\",\"granted\":true},{\"permission\":\"write\",\"granted\":true}]"
-        }
-      ]
-    },
-    {
-      "name": "List Permissions",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "// ============================================",
-              "// List Permissions - GET /permissions",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 for successful request\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 304]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests ---",
-              "pm.test(\"Response is an array of permission types\", function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(Array.isArray(json)).to.be.true;",
-              "});",
-              "",
-              "pm.test(\"Response array is not empty\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const json = pm.response.json();",
-              "        pm.expect(json.length).to.be.greaterThan(0);",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Each permission object has required 'permission' property\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((perm, index) => {",
-              "        pm.expect(perm, `Permission at index ${index}`).to.be.a(\"string\");",
-              "    });",
-              "});",
-              "",
-              "// --- Data Type Tests ---",
-              "pm.test(\"Permission name is a non-empty string\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((perm, index) => {",
-              "        pm.expect(perm, `Permission name at index ${index}`).to.be.a(\"string\");",
-              "        pm.expect(perm.trim().length, `Permission name at index ${index}`).to.be.greaterThan(0);",
-              "    });",
-              "});",
-              "",
-              "// --- Business Logic Tests ---",
-              "pm.test(\"All permission names are unique\", function () {",
-              "    const json = pm.response.json();",
-              "    const permNames = json.map(p => p.toLowerCase());",
-              "    const uniqueNames = [...new Set(permNames)];",
-              "    pm.expect(permNames.length).to.equal(uniqueNames.length);",
-              "});",
-              "",
-              "pm.test(\"Permission names are valid (alphanumeric with underscores/hyphens)\", function () {",
-              "    const json = pm.response.json();",
-              "    const validPermissionRegex = /^[a-z0-9_-]+$/i;",
-              "    json.forEach((perm, index) => {",
-              "        pm.expect(perm, `Permission at index ${index}`).to.match(validPermissionRegex);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"Common permissions exist (read, write, delete)\", function () {",
-              "    const json = pm.response.json();",
-              "    const permNames = json.map(p => p.toLowerCase());",
-              "    const commonPerms = ['read', 'write', 'delete'];",
-              "    commonPerms.forEach(common => {",
-              "        pm.expect(permNames, `Expected '${common}' permission to exist`).to.include(common);",
-              "    });",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Permission objects do not contain internal metadata\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((perm, index) => {",
-              "        pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"internalId\");",
-              "        pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"createdBy\");",
-              "    });",
-              "});"
-            ],
-            "type": "text/javascript"
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "id": "d9aa22ec-bffa-4257-be24-c73fb5d7341a",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseURL}}/permissions",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "permissions"
-          ]
-        }
-      },
-      "response": [
-        {
-          "id": "f0bb0294-1f38-497a-baec-e50eb63f8b69",
-          "name": "Permission Types",
-          "originalRequest": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/permissions",
-              "host": [
-                "{{baseUrl}}"
               ],
-              "path": [
-                "permissions"
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3",
+                  "description": "Unique identifier of the user"
+                }
               ]
-            }
+            },
+            "description": "Replace all permissions for a specific user"
           },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"permission\":\"read\"},{\"permission\":\"write\"},{\"permission\":\"admin\"}]"
-        }
-      ]
-    },
-    {
-      "name": "Grant User Permission",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "d2ecd5b4-0083-4263-bc79-d229274f38f9",
-            "exec": [
-              "// ============================================",
-              "// Grant User Permission - POST /users/:user_id/permissions",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 or 201 for successful grant\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 400, 404, 409, 422]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests (for successful responses) ---",
-              "if (pm.response.code === 200 || pm.response.code === 201) {",
-              "    pm.test(\"Response is an array of permissions\", function () {",
-              "        const json = pm.response.json();",
-              "        pm.expect(Array.isArray(json)).to.be.true;",
-              "    });",
-              "",
-              "    pm.test(\"Each permission object has required properties\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.have.property(\"permission\");",
-              "            pm.expect(perm, `Permission at index ${index}`).to.have.property(\"granted\");",
-              "        });",
-              "    });",
-              "",
-              "    // --- Data Type Tests ---",
-              "    pm.test(\"Permission name is a non-empty string\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm.permission, `Permission name at index ${index}`).to.be.a(\"string\");",
-              "            pm.expect(perm.permission.trim().length, `Permission name at index ${index}`).to.be.greaterThan(0);",
-              "        });",
-              "    });",
-              "",
-              "    pm.test(\"Granted field is a boolean\", function () {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm.granted, `Granted at index ${index}`).to.be.a(\"boolean\");",
-              "        });",
-              "    });",
-              "",
-              "    // --- Business Logic Tests ---",
-              "    pm.test(\"Granted permission is included in response\", function () {",
-              "        const json = pm.response.json();",
-              "        let requestBody;",
-              "        try { requestBody = JSON.parse(pm.request.body.raw); } catch (e) { requestBody = {}; }",
-              "        if (requestBody.permission) {",
-              "            const responsePermNames = json.map(p => p.permission.toLowerCase());",
-              "            pm.expect(responsePermNames).to.include(requestBody.permission.toLowerCase());",
-              "        }",
-              "    });",
-              "",
-              "    pm.test(\"Granted permission has correct granted status\", function () {",
-              "        const json = pm.response.json();",
-              "        let requestBody;",
-              "        try { requestBody = JSON.parse(pm.request.body.raw); } catch (e) { requestBody = {}; }",
-              "        if (requestBody.permission && requestBody.granted !== undefined) {",
-              "            const grantedPerm = json.find(p => p.permission.toLowerCase() === requestBody.permission.toLowerCase());",
-              "            if (grantedPerm) {",
-              "                pm.expect(grantedPerm.granted).to.equal(requestBody.granted);",
-              "            }",
-              "        }",
-              "    });",
-              "",
-              "    pm.test(\"Permission names are unique in response\", function () {",
-              "        const json = pm.response.json();",
-              "        const permNames = json.map(p => p.permission.toLowerCase());",
-              "        const uniqueNames = [...new Set(permNames)];",
-              "        pm.expect(permNames.length).to.equal(uniqueNames.length);",
-              "    });",
-              "}",
-              "",
-              "// --- 400 Bad Request Tests ---",
-              "pm.test(\"400 response for invalid input has proper structure\", function () {",
-              "    if (pm.response.code === 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- 404 Not Found Tests ---",
-              "pm.test(\"404 response for non-existent user has proper structure\", function () {",
-              "    if (pm.response.code === 404) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- 409 Conflict Tests ---",
-              "pm.test(\"409 response for duplicate permission has proper structure\", function () {",
-              "    if (pm.response.code === 409) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not expose internal user data\", function () {",
-              "    if (pm.response.code === 200 || pm.response.code === 201) {",
-              "        const json = pm.response.json();",
-              "        json.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"userId\");",
-              "            pm.expect(perm, `Permission at index ${index}`).to.not.have.property(\"internalId\");",
-              "        });",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
+          "response": []
         },
         {
-          "listen": "prerequest",
-          "script": {
-            "id": "ba9a31a1-37f2-4549-8600-e648aa1fa79c",
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "id": "b7655962-6be3-4b61-83b0-4afee7de803e",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\"permission\":\"admin\",\"granted\":true}"
-        },
-        "url": {
-          "raw": "{{baseURL}}/users/{{user_id}}/permissions",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users",
-            "{{user_id}}",
-            "permissions"
-          ]
-        }
-      },
-      "response": [
-        {
-          "id": "1ec67290-915c-46b5-a859-feab0f54ec0b",
-          "name": "Permission Granted",
-          "originalRequest": {
+          "name": "Add permissions to user",
+          "id": "2068b1c7-101d-4e57-9e62-027c15c3b0a0",
+          "request": {
             "method": "POST",
             "header": [
               {
@@ -1022,680 +152,85 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"permission\":\"admin\",\"granted\":true}"
+              "raw": "{\n  \"permission\": \"admin\",\n  \"granted\": true\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/users/2/permissions",
+              "raw": "{{baseUrl}}/users/:userId/permissions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "users",
-                "2",
+                ":userId",
                 "permissions"
+              ],
+              "variable": [
+                {
+                  "key": "userId",
+                  "value": "3",
+                  "description": "Unique identifier of the user"
+                }
               ]
-            }
+            },
+            "description": "Add new permissions to a specific user without removing existing ones"
           },
-          "status": "Created",
-          "code": 201,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"permission\":\"admin\",\"granted\":true}]"
-        }
-      ]
-    },
-    {
-      "name": "Delete Users",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "7098406b-e307-4ec6-9a94-fd6a2b301019",
-            "exec": [
-              "// ============================================",
-              "// Delete Users - DELETE /users/:user_id",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 or 204 for successful deletion\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 204]);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 400, 401, 403, 404]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present for non-204 responses\", function () {",
-              "    if (pm.response.code !== 204) {",
-              "        pm.response.to.have.header(\"Content-Type\");",
-              "    }",
-              "});",
-              "",
-              "// --- Structure Tests (for successful responses with body) ---",
-              "if (pm.response.code === 200) {",
-              "    pm.test(\"Response body is valid JSON or empty\", function () {",
-              "        const text = pm.response.text();",
-              "        if (text && text.trim().length > 0) {",
-              "            let json;",
-              "            try {",
-              "                json = pm.response.json();",
-              "                pm.expect(json).to.be.an(\"object\");",
-              "            } catch (e) {",
-              "                pm.expect.fail(\"Response is not valid JSON\");",
-              "            }",
-              "        }",
-              "    });",
-              "",
-              "    pm.test(\"Success response may contain confirmation message\", function () {",
-              "        const text = pm.response.text();",
-              "        if (text && text.trim().length > 0) {",
-              "            let json;",
-              "            try {",
-              "                json = pm.response.json();",
-              "                if (json.message) {",
-              "                    pm.expect(json.message).to.be.a(\"string\");",
-              "                }",
-              "            } catch (e) {",
-              "                // Response might be empty or non-JSON",
-              "            }",
-              "        }",
-              "    });",
-              "}",
-              "",
-              "// --- 204 No Content Tests ---",
-              "pm.test(\"204 response has no body\", function () {",
-              "    if (pm.response.code === 204) {",
-              "        const text = pm.response.text();",
-              "        pm.expect(text.trim().length).to.equal(0);",
-              "    }",
-              "});",
-              "",
-              "// --- 401 Unauthorized Tests ---",
-              "pm.test(\"401 response for unauthorized access has proper structure\", function () {",
-              "    if (pm.response.code === 401) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- 403 Forbidden Tests ---",
-              "pm.test(\"403 response for forbidden access has proper structure\", function () {",
-              "    if (pm.response.code === 403) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- 404 Not Found Tests ---",
-              "pm.test(\"404 response for non-existent user has proper structure\", function () {",
-              "    if (pm.response.code === 404) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "        pm.expect(responseText).to.not.include(\"internal server\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not expose deleted user's sensitive data\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const text = pm.response.text();",
-              "        if (text && text.trim().length > 0) {",
-              "            let json;",
-              "            try {",
-              "                json = pm.response.json();",
-              "                pm.expect(json).to.not.have.property(\"password\");",
-              "                pm.expect(json).to.not.have.property(\"passwordHash\");",
-              "                pm.expect(json).to.not.have.property(\"secret\");",
-              "                pm.expect(json).to.not.have.property(\"token\");",
-              "            } catch (e) {",
-              "                // Response might be empty or non-JSON",
-              "            }",
-              "        }",
-              "    }",
-              "});",
-              "",
-              "// --- Business Logic Tests ---",
-              "pm.test(\"Deletion is idempotent (subsequent deletes return 404 or success)\", function () {",
-              "    // This test documents expected behavior - actual verification requires multiple requests",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 204, 404]);",
-              "});",
-              "",
-              "// --- Re-add Deleted User ---",
-              "// After successful deletion, re-add the user back to the database",
-              "if (pm.response.code === 200 || pm.response.code === 204) {",
-              "    const baseURL = pm.collectionVariables.get('baseURL') || pm.variables.get('baseURL');",
-              "    const deletedUserId = pm.request.url.path[pm.request.url.path.length - 1] || '2';",
-              "    ",
-              "    // Default user data for user ID 2 (Bob Smith)",
-              "    const userData = {",
-              "        id: parseInt(deletedUserId) || 2,",
-              "        name: 'Bob Smith',",
-              "        email: 'bob.smith@techcorp.com',",
-              "        permissions: [",
-              "            { permission: 'read', granted: true },",
-              "            { permission: 'write', granted: true },",
-              "            { permission: 'delete', granted: false },",
-              "            { permission: 'admin', granted: false }",
-              "        ]",
-              "    };",
-              "    ",
-              "    pm.sendRequest({",
-              "        url: baseURL + '/users',",
-              "        method: 'POST',",
-              "        header: {",
-              "            'Content-Type': 'application/json'",
-              "        },",
-              "        body: {",
-              "            mode: 'raw',",
-              "            raw: JSON.stringify(userData)",
-              "        }",
-              "    }, function (err, res) {",
-              "        if (err) {",
-              "            console.log('Error re-adding user:', err);",
-              "        } else {",
-              "            console.log('User re-added successfully. Status:', res.code);",
-              "        }",
-              "    });",
-              "}"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "id": "00d11dc6-2000-4727-97c9-95ab569475e1",
-            "exec": [
-              "// Pre-request script to ensure user 2 exists before deletion",
-              "const baseURL = pm.collectionVariables.get('baseURL') || pm.variables.get('baseURL');",
-              "",
-              "// User data for user ID 2 (Bob Smith)",
-              "const userData = {",
-              "    id: 2,",
-              "    name: 'Bob Smith',",
-              "    email: 'bob.smith@techcorp.com',",
-              "    permissions: [",
-              "        { permission: 'read', granted: true },",
-              "        { permission: 'write', granted: true },",
-              "        { permission: 'delete', granted: false },",
-              "        { permission: 'admin', granted: false }",
-              "    ]",
-              "};",
-              "",
-              "// Create user 2 if it doesn't exist",
-              "pm.sendRequest({",
-              "    url: baseURL + '/users',",
-              "    method: 'POST',",
-              "    header: {",
-              "        'Content-Type': 'application/json'",
-              "    },",
-              "    body: {",
-              "        mode: 'raw',",
-              "        raw: JSON.stringify(userData)",
-              "    }",
-              "}, function (err, res) {",
-              "    if (err) {",
-              "        console.log('Error creating user 2:', err);",
-              "    } else if (res.code === 201 || res.code === 200) {",
-              "        console.log('User 2 created/exists. Status:', res.code);",
-              "    } else if (res.code === 409) {",
-              "        console.log('User 2 already exists (conflict). Proceeding with delete.');",
-              "    } else {",
-              "        console.log('User creation response:', res.code, res.text());",
-              "    }",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
+          "response": []
         }
       ],
-      "id": "0c92e2d2-f4e4-420d-963f-0bbd97e21ef2",
-      "request": {
-        "method": "DELETE",
-        "header": [],
-        "url": {
-          "raw": "{{baseURL}}/users/:user_id",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users",
-            ":user_id"
-          ],
-          "variable": [
-            {
-              "key": "user_id",
-              "value": "2",
-              "description": "The ID of the user to delete"
-            }
-          ]
-        }
-      },
-      "response": []
+      "id": "4db75401-764d-4fa3-80ec-9649f31864fa",
+      "description": "Operations for managing user permissions"
     },
     {
-      "name": "Create New User",
-      "event": [
+      "name": "Permissions",
+      "item": [
         {
-          "listen": "test",
-          "script": {
-            "id": "a89504dc-bd93-49d2-a4f3-79f005cd9762",
-            "exec": [
-              "// ============================================",
-              "// Create User - POST /users",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 201 (Created) or 200 (OK)\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
-              "});",
-              "",
-              "// --- Response Structure Tests ---",
-              "pm.test(\"Response has valid JSON structure\", function () {",
-              "    pm.response.to.be.json;",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.be.an(\"object\");",
-              "});",
-              "",
-              "pm.test(\"Response contains the created user data\", function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(json).to.have.property(\"id\");",
-              "    pm.expect(json).to.have.property(\"name\");",
-              "    pm.expect(json).to.have.property(\"email\");",
-              "});",
-              "",
-              "// --- Data Validation Tests ---",
-              "pm.test(\"User ID matches the request\", function () {",
-              "    const json = pm.response.json();",
-              "    const requestBody = JSON.parse(pm.request.body.raw);",
-              "    pm.expect(json.id).to.eql(requestBody.id);",
-              "});",
-              "",
-              "pm.test(\"Email format is valid\", function () {",
-              "    const json = pm.response.json();",
-              "    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;",
-              "    pm.expect(json.email).to.match(emailRegex);",
-              "});",
-              "",
-              "pm.test(\"User name matches the request\", function () {",
-              "    const json = pm.response.json();",
-              "    const requestBody = JSON.parse(pm.request.body.raw);",
-              "    pm.expect(json.name).to.eql(requestBody.name);",
-              "});",
-              "",
-              "// --- Permissions Validation ---",
-              "pm.test(\"Response contains permissions array if provided\", function () {",
-              "    const json = pm.response.json();",
-              "    if (json.permissions) {",
-              "        pm.expect(json.permissions).to.be.an(\"array\");",
-              "        json.permissions.forEach((perm, index) => {",
-              "            pm.expect(perm, `Permission at index ${index}`).to.have.property(\"permission\");",
-              "            pm.expect(perm, `Permission at index ${index}`).to.have.property(\"granted\");",
-              "        });",
-              "    }",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "id": "8eefd7dd-a2bc-4b2e-a3a3-a2aeb54288b1",
-            "exec": [
-              "// Generate dynamic user data for each request",
-              "",
-              "// Generate a unique ID using timestamp to avoid conflicts",
-              "const userId = Date.now();",
-              "",
-              "// Generate random name using Postman's dynamic variables",
-              "const firstName = pm.variables.replaceIn('{{$randomFirstName}}');",
-              "const lastName = pm.variables.replaceIn('{{$randomLastName}}');",
-              "const userName = firstName + ' ' + lastName;",
-              "",
-              "// Generate random email using Postman's dynamic variables",
-              "const userEmail = pm.variables.replaceIn('{{$randomEmail}}');",
-              "",
-              "// Set local variables for use in the request body",
-              "pm.variables.set('userId', userId);",
-              "pm.variables.set('userName', userName);",
-              "pm.variables.set('userEmail', userEmail);",
-              "",
-              "console.log('Generated user data:');",
-              "console.log('  ID:', userId);",
-              "console.log('  Name:', userName);",
-              "console.log('  Email:', userEmail);"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "id": "fb78b72b-19ee-4408-918c-62d7aabefe13",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n  \"id\": {{userId}},\n  \"name\": \"{{userName}}\",\n  \"email\": \"{{userEmail}}\",\n  \"permissions\": [\n    {\"permission\": \"read\", \"granted\": true},\n    {\"permission\": \"write\", \"granted\": true},\n    {\"permission\": \"delete\", \"granted\": false},\n    {\"permission\": \"admin\", \"granted\": false}\n  ]\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "{{baseURL}}/users",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users"
-          ]
-        },
-        "description": "Creates a new user with the specified details and permissions."
-      },
-      "response": []
-    },
-    {
-      "name": "List Users Copy",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "id": "2a2c39aa-365b-4c21-94e5-ead21d2ab3c7",
-            "exec": [
-              "// ============================================",
-              "// List Users - GET /users",
-              "// Comprehensive Test Suite",
-              "// ============================================",
-              "",
-              "// --- Performance Tests ---",
-              "pm.test(\"Response time is acceptable (under 2000ms)\", function () {",
-              "    pm.expect(pm.response.responseTime).to.be.below(2000);",
-              "});",
-              "",
-              "// --- Status Code Tests ---",
-              "pm.test(\"Status code is 200 for successful request\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "",
-              "pm.test(\"Status code is in expected range\", function () {",
-              "    pm.expect(pm.response.code).to.be.oneOf([200, 304]);",
-              "});",
-              "",
-              "// --- Header Tests ---",
-              "pm.test(\"Content-Type header is present and correct\", function () {",
-              "    pm.response.to.have.header(\"Content-Type\");",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.include(\"application/json\");",
-              "});",
-              "",
-              "// --- Structure Tests ---",
-              "pm.test(\"Response is an array of users\", function () {",
-              "    const json = pm.response.json();",
-              "    pm.expect(Array.isArray(json)).to.be.true;",
-              "});",
-              "",
-              "pm.test(\"Response array is not empty (if 200)\", function () {",
-              "    if (pm.response.code === 200) {",
-              "        const json = pm.response.json();",
-              "        pm.expect(json.length).to.be.greaterThan(0);",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Each user has required properties: id, name, email\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"id\");",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"name\");",
-              "        pm.expect(user, `User at index ${index}`).to.have.property(\"email\");",
-              "    });",
-              "});",
-              "",
-              "// --- Data Type Tests ---",
-              "pm.test(\"User id is a number or string\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(typeof user.id, `User id at index ${index}`).to.be.oneOf([\"number\", \"string\"]);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"User name is a non-empty string\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user.name, `User name at index ${index}`).to.be.a(\"string\");",
-              "        pm.expect(user.name.trim().length, `User name at index ${index}`).to.be.greaterThan(0);",
-              "    });",
-              "});",
-              "",
-              "pm.test(\"User email is a valid email format\", function () {",
-              "    const json = pm.response.json();",
-              "    const emailRegex = /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/;",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user.email, `User email at index ${index}`).to.be.a(\"string\");",
-              "        pm.expect(user.email, `User email at index ${index}`).to.match(emailRegex);",
-              "    });",
-              "});",
-              "",
-              "// --- Business Logic Tests ---",
-              "pm.test(\"All user IDs are unique\", function () {",
-              "    const json = pm.response.json();",
-              "    const ids = json.map(user => user.id);",
-              "    const uniqueIds = [...new Set(ids)];",
-              "    pm.expect(ids.length).to.equal(uniqueIds.length);",
-              "});",
-              "",
-              "pm.test(\"All user emails are unique\", function () {",
-              "    const json = pm.response.json();",
-              "    const emails = json.map(user => user.email.toLowerCase());",
-              "    const uniqueEmails = [...new Set(emails)];",
-              "    pm.expect(emails.length).to.equal(uniqueEmails.length);",
-              "});",
-              "",
-              "// --- Error Handling Tests ---",
-              "pm.test(\"Error responses have proper structure\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        let body;",
-              "        try { body = pm.response.json(); } catch (e) { body = {}; }",
-              "        pm.expect(body).to.be.an(\"object\");",
-              "        pm.expect(body).to.have.any.keys(\"error\", \"message\");",
-              "    }",
-              "});",
-              "",
-              "// --- Security Tests ---",
-              "pm.test(\"Error responses do not leak sensitive information\", function () {",
-              "    if (pm.response.code >= 400) {",
-              "        const responseText = pm.response.text().toLowerCase();",
-              "        pm.expect(responseText).to.not.include(\"stack trace\");",
-              "        pm.expect(responseText).to.not.include(\"sql\");",
-              "        pm.expect(responseText).to.not.include(\"password\");",
-              "        pm.expect(responseText).to.not.include(\"secret\");",
-              "        pm.expect(responseText).to.not.include(\"internal server\");",
-              "    }",
-              "});",
-              "",
-              "pm.test(\"Response does not contain sensitive user data\", function () {",
-              "    const json = pm.response.json();",
-              "    json.forEach((user, index) => {",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"password\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"passwordHash\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"secret\");",
-              "        pm.expect(user, `User at index ${index}`).to.not.have.property(\"token\");",
-              "    });",
-              "});",
-              "",
-              "// --- Workflow: Extract and save user_id for chaining ---",
-              "if (pm.response.code === 200) {",
-              "    const json = pm.response.json();",
-              "    let userId = null;",
-              "    ",
-              "    if (Array.isArray(json) && json.length > 0) {",
-              "        userId = json[0].id;",
-              "    } else if (json && json.users && Array.isArray(json.users) && json.users.length > 0) {",
-              "        userId = json.users[0].id;",
-              "    } else if (json && json.id) {",
-              "        userId = json.id;",
-              "    }",
-              "    ",
-              "    if (userId !== null && userId !== undefined) {",
-              "        pm.collectionVariables.set(\"user_id\", userId);",
-              "        console.log(\"Saved user_id to collection variable:\", userId);",
-              "    } else {",
-              "        console.warn(\"Could not extract user_id from response\");",
-              "    }",
-              "}"
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        },
-        {
-          "listen": "prerequest",
-          "script": {
-            "id": "14d131a4-2690-4b11-9606-7a2a2205a905",
-            "exec": [
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {},
-            "requests": {}
-          }
-        }
-      ],
-      "id": "46a6d531-48ff-447c-b8d5-4e1a95461bbf",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseURL}}/users",
-          "host": [
-            "{{baseURL}}"
-          ],
-          "path": [
-            "users"
-          ]
-        }
-      },
-      "response": [
-        {
-          "id": "1b0d03bd-910c-4bbc-babb-1caa4147002a",
-          "name": "Example User List",
-          "originalRequest": {
+          "name": "List all permissions",
+          "id": "06c067a1-dae4-4a69-9f08-4c7e72018923",
+          "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users",
+              "raw": "{{baseUrl}}/permissions?limit=20&offset=0",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
-                "users"
+                "permissions"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Maximum number of items to return (1-100, default: 20)"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Number of items to skip for pagination (default: 0)"
+                }
               ]
-            }
+            },
+            "description": "Retrieve a list of all available permissions in the system"
           },
-          "status": "OK",
-          "code": 200,
-          "_postman_previewlanguage": "json",
-          "header": null,
-          "cookie": [],
-          "body": "[{\"id\":1,\"name\":\"Alice\",\"email\":\"alice@example.com\"},{\"id\":2,\"name\":\"Bob\",\"email\":\"bob@example.com\"}]"
+          "response": []
         }
-      ]
+      ],
+      "id": "de8ec302-aff6-411b-83a0-e2da3d37d682",
+      "description": "Permission catalog operations"
     }
   ],
+  "auth": {
+    "type": "noauth"
+  },
   "variable": [
     {
-      "id": "20f69125-cdb0-44fe-b4ee-ee1a259d7285",
-      "key": "baseURL",
-      "value": "http://localhost:4000"
+      "id": "6fd20af2-a52c-4e8e-b30a-a9fc6345a2b7",
+      "key": "baseUrl",
+      "value": "http://localhost:3000/v1"
     },
     {
-      "id": "8ee3f82b-e164-447c-b202-cd2d42b881c9",
-      "key": "user_id",
-      "value": "1"
-    },
-    {
-      "id": "34c5ce3a-b60c-4a6c-9a73-6eab9ce5faaf",
-      "key": "randomUserId",
-      "value": ""
-    },
-    {
-      "id": "bee1638c-a17d-4006-b3f8-c57fe2186b31",
-      "key": "randomUserName",
-      "value": ""
-    },
-    {
-      "id": "ad2076ac-e191-4beb-be82-f75e491d8032",
-      "key": "randomUserFirstName",
-      "value": ""
-    },
-    {
-      "id": "47761dfb-acf7-4d50-9581-336d9190ad25",
-      "key": "randomUserLastName",
-      "value": ""
-    },
-    {
-      "id": "203d835e-8bb9-4956-ba6f-7e76f61d5124",
-      "key": "randomUserEmail",
+      "id": "4be89592-c9cd-4923-ae5d-192c5568f73d",
+      "key": "bearerToken",
       "value": ""
     }
   ]
