@@ -1,0 +1,111 @@
+id: bd515596-1c6f-4050-80ef-d2e9da663180
+name: User Permissions API
+description: API for managing user permissions and access control
+type: collection
+variables:
+  - key: baseUrl
+    value: 'http://localhost:3000/v1'
+    disabled: false
+  - key: bearerToken
+    value: ''
+    disabled: false
+auth:
+  type: noauth
+items:
+  - id: b703c0a3-62e7-4a48-8d89-19cef0cd67fb
+    name: Users
+    description: User management operations
+    type: folder
+    items:
+      - id: 3330d95c-5e3a-4269-a79a-726726bbbf0d
+        name: List all users
+        url: '{{baseUrl}}/users?limit=20&offset=0'
+        method: GET
+        queryParams:
+          - key: limit
+            value: '20'
+            description: 'Maximum number of items to return (1-100, default: 20)'
+          - key: offset
+            value: '0'
+            description: 'Number of items to skip for pagination (default: 0)'
+        type: http
+      - id: 7e513679-0524-43f8-b133-698b155709c8
+        name: Delete a user
+        url: '{{baseUrl}}/users/:user_id'
+        method: DELETE
+        pathVariables:
+          - key: user_id
+            value: '10'
+            description: Unique identifier of the user
+        type: http
+  - id: 4db75401-764d-4fa3-80ec-9649f31864fa
+    name: User Permissions
+    description: Operations for managing user permissions
+    type: folder
+    items:
+      - id: 49146026-3215-4002-b47d-9c7e54479e44
+        name: Get user permissions
+        url: '{{baseUrl}}/users/:userId/permissions'
+        method: GET
+        pathVariables:
+          - key: userId
+            value: '3'
+            description: Unique identifier of the user
+        type: http
+      - id: 1446bf67-7dea-4aa0-b76f-cf8501e0feb2
+        name: Update user permissions
+        url: '{{baseUrl}}/users/:userId/permissions'
+        method: PUT
+        headers:
+          - key: Content-Type
+            value: application/json
+        pathVariables:
+          - key: userId
+            value: '3'
+            description: Unique identifier of the user
+        body:
+          type: text
+          content: |-
+            [
+              {"permission": "read", "granted": true},
+              {"permission": "write", "granted": true},
+              {"permission": "delete", "granted": false},
+              {"permission": "admin", "granted": false}
+            ]
+        type: http
+      - id: 2068b1c7-101d-4e57-9e62-027c15c3b0a0
+        name: Add permissions to user
+        url: '{{baseUrl}}/users/:userId/permissions'
+        method: POST
+        headers:
+          - key: Content-Type
+            value: application/json
+        pathVariables:
+          - key: userId
+            value: '3'
+            description: Unique identifier of the user
+        body:
+          type: text
+          content: |-
+            {
+              "permission": "admin",
+              "granted": true
+            }
+        type: http
+  - id: de8ec302-aff6-411b-83a0-e2da3d37d682
+    name: Permissions
+    description: Permission catalog operations
+    type: folder
+    items:
+      - id: 06c067a1-dae4-4a69-9f08-4c7e72018923
+        name: List all permissions
+        url: '{{baseUrl}}/permissions?limit=20&offset=0'
+        method: GET
+        queryParams:
+          - key: limit
+            value: '20'
+            description: 'Maximum number of items to return (1-100, default: 20)'
+          - key: offset
+            value: '0'
+            description: 'Number of items to skip for pagination (default: 0)'
+        type: http

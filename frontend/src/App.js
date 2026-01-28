@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './index.css';
 
-const API = 'http://localhost:4000';
+const API = 'http://localhost:3000/v1';
 
 function App() {
   const [users, setUsers] = useState([]);
