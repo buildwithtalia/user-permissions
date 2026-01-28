@@ -30,13 +30,13 @@ jobs:
           node server.js &
           echo $! > server.pid
         env:
-          PORT: 4000
+          PORT: 3000
 
       - name: Wait for server to be ready
         run: |
           echo "Waiting for server to start..."
           timeout=30
-          while ! curl -s http://localhost:4000 > /dev/null 2>&1; do
+          while ! curl -s http://localhost:3000/v1/permissions > /dev/null 2>&1; do
             sleep 1
             timeout=$((timeout - 1))
             if [ $timeout -le 0 ]; then
@@ -67,7 +67,7 @@ jobs:
             --reporters cli,json,html \
             --reporter-json-export newman/test-results.json \
             --reporter-html-export newman/test-results.html \
-            --env-var baseURL=http://localhost:4000 \
+            --env-var baseURL=http://localhost:3000/v1 \
             --bail || echo "⚠️ Some tests may have failed, but reports were generated"
         env:
           POSTMAN_API_KEY: ${{ secrets.POSTMAN_API_KEY }}
