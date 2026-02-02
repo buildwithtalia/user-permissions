@@ -1,0 +1,18 @@
+id: 1446bf67-7dea-4aa0-b76f-cf8501e0feb2
+name: Update user permissions
+url: '{{baseUrl}}/users/:userId/permissions'
+method: PUT
+headers:
+  - key: Content-Type
+    value: application/json
+pathVariables:
+  - key: userId
+    value: user-1
+    description: Unique identifier of the user
+body:
+  type: text
+  content: |-
+    {
+      "permissionIds": ["perm-read-users", "perm-write-users"]
+    }
+type: http

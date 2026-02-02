@@ -1,0 +1,18 @@
+id: 2068b1c7-101d-4e57-9e62-027c15c3b0a0
+name: Add permissions to user
+url: '{{baseUrl}}/users/:userId/permissions'
+method: POST
+headers:
+  - key: Content-Type
+    value: application/json
+pathVariables:
+  - key: userId
+    value: user-3
+    description: Unique identifier of the user
+body:
+  type: text
+  content: |-
+    {
+      "permissionIds": ["perm-admin"]
+    }
+type: http

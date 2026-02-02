@@ -1,0 +1,9 @@
+id: 7e513679-0524-43f8-b133-698b155709c8
+name: Delete a user
+url: '{{baseUrl}}/users/:userId'
+method: DELETE
+pathVariables:
+  - key: userId
+    value: user-5
+    description: Unique identifier of the user
+type: http

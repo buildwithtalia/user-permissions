@@ -136,7 +136,6 @@ app.get('/v1/users/:userId/permissions', (req, res) => {
   res.json({
     userId: userId,
     permissions: permissions,
-    updatedAt: userPerms.updatedAt
   });
 });
 
@@ -165,7 +164,6 @@ app.put('/v1/users/:userId/permissions', (req, res) => {
   res.json({
     userId: userId,
     permissions: permissions,
-    updatedAt: updatedAt
   });
 });
 
@@ -197,7 +195,6 @@ app.post('/v1/users/:userId/permissions', (req, res) => {
   res.status(201).json({
     userId: userId,
     permissions: permissions,
-    updatedAt: updatedAt
   });
 });
 
