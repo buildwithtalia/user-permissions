@@ -1,0 +1,12 @@
+id: 3330d95c-5e3a-4269-a79a-726726bbbf0d
+name: List all users
+url: '{{baseUrl}}/users?limit=20&offset=0'
+method: GET
+queryParams:
+  - key: limit
+    value: '20'
+    description: 'Maximum number of items to return (1-100, default: 20)'
+  - key: offset
+    value: '0'
+    description: 'Number of items to skip for pagination (default: 0)'
+type: http

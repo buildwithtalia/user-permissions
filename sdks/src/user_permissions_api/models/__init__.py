@@ -1,2 +1,0 @@
-from .update_user_permissions_request import UpdateUserPermissionsRequest
-from .grant_user_permission_request import GrantUserPermissionRequest

@@ -1,0 +1,9 @@
+id: 49146026-3215-4002-b47d-9c7e54479e44
+name: Get user permissions
+url: '{{baseUrl}}/users/:userId/permissions'
+method: GET
+pathVariables:
+  - key: userId
+    value: user-1
+    description: Unique identifier of the user
+type: http

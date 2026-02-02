@@ -1,0 +1,14 @@
+id: bd515596-1c6f-4050-80ef-d2e9da663180
+name: User Permissions API
+description: API for managing user permissions and access control
+type: collection
+variables:
+  - key: baseUrl
+    value: 'http://localhost:3000/v1'
+    disabled: false
+  - key: bearerToken
+    value: ''
+    disabled: false
+  - key: userId
+    value: ''
+    disabled: false
