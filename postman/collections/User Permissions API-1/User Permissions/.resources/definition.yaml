@@ -1,0 +1,3 @@
+$kind: collection
+description: Operations for managing user permissions
+order: 2000

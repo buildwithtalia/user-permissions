@@ -1,0 +1,10 @@
+$kind: http-request
+name: Create a user
+description: Remove a user from the system
+url: "{{baseUrl}}/users/:user_id"
+method: POST
+pathVariables:
+  - key: user_id
+    value: user-9
+    description: Unique identifier of the user
+order: 4447269931712536

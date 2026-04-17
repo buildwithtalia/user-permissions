@@ -1,0 +1,7 @@
+$kind: collection
+name: User Permissions API
+description: API for managing user permissions and access control
+variables:
+  baseUrl: http://localhost:3000/v1
+  bearerToken: ""
+  userId: user-1

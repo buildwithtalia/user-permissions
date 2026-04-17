@@ -1,0 +1,5 @@
+name: User Permissions API - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:3000/v1'
+    enabled: true

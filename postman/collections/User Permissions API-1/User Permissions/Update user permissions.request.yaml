@@ -1,0 +1,17 @@
+$kind: http-request
+description: Replace all permissions for a specific user
+url: "{{baseUrl}}/users/:userId/permissions"
+method: PUT
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: userId
+    value: user-1
+    description: Unique identifier of the user
+body:
+  type: text
+  content: |-
+    {
+      "permissionIds": ["perm-read-users", "perm-write-users", "perm-admin"]
+    }
+order: 2000

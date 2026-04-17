@@ -1,0 +1,9 @@
+$kind: http-request
+description: Retrieve all permissions assigned to a specific user
+url: "{{baseUrl}}/users/:userId/permissions"
+method: GET
+pathVariables:
+  - key: userId
+    value: user-1
+    description: Unique identifier of the user
+order: 1000

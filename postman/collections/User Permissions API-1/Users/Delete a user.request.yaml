@@ -1,0 +1,9 @@
+$kind: http-request
+description: Remove a user from the system
+url: "{{baseUrl}}/users/:user_id"
+method: DELETE
+pathVariables:
+  - key: user_id
+    value: user-9
+    description: Unique identifier of the user
+order: 2000

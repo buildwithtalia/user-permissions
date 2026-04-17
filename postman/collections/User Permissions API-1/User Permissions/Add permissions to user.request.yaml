@@ -1,0 +1,17 @@
+$kind: http-request
+description: Add new permissions to a specific user without removing existing ones
+url: "{{baseUrl}}/users/:userId/permissions"
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  - key: userId
+    value: user-1
+    description: Unique identifier of the user
+body:
+  type: text
+  content: |-
+    {
+      "permissionIds": ["perm-delete-users"]
+    }
+order: 3000
