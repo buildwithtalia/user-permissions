@@ -12,8 +12,8 @@ function App() {
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
-    axios.get(`${API}/users`).then(res => setUsers(res.data));
-    axios.get(`${API}/permissions`).then(res => setPermissions(res.data));
+    axios.get(`${API}/users`).then(res => setUsers(res.data.users));
+    axios.get(`${API}/permissions`).then(res => setPermissions(res.data.permissions));
   }, []);
 
   const selectUser = user => {
@@ -22,25 +22,27 @@ function App() {
       axios.get(`${API}/users/${user.id}/permissions`),
       axios.get(`${API}/permissions`)
     ]).then(([userPermsRes, allPermsRes]) => {
-      const grantedPerms = userPermsRes.data;
-      const allPerms = allPermsRes.data;
+      const grantedPerms = userPermsRes.data.permissions;
+      const allPerms = allPermsRes.data.permissions;
+      const grantedPermIds = grantedPerms.map(p => p.id);
       const userPermissions = allPerms.map(perm => ({
         permission: perm,
-        granted: grantedPerms.includes(perm)
+        granted: grantedPermIds.includes(perm.id)
       }));
       setUserPerms(userPermissions);
     });
   };
 
   const updatePermission = (perm, granted) => {
-    const updated = userPerms.map(p => p.permission === perm ? { ...p, granted } : p);
+    const updated = userPerms.map(p => p.permission.id === perm.id ? { ...p, granted } : p);
     setUserPerms(updated);
   };
 
   const savePermissions = () => {
     setIsSaving(true);
-    axios.put(`${API}/users/${selectedUser.id}/permissions`, userPerms)
-      .then(res => {
+    const permissionIds = userPerms.filter(p => p.granted).map(p => p.permission.id);
+    axios.put(`${API}/users/${selectedUser.id}/permissions`, { permissionIds })
+      .then(() => {
         setIsSaving(false);
         // Show success message with modern styling
         const successMsg = document.createElement('div');
@@ -150,19 +152,19 @@ function App() {
                   </div>
                 ) : (
                   permissions.map(perm => {
-                    const userPerm = userPerms.find(p => p.permission === perm) || { permission: perm, granted: false };
+                    const userPerm = userPerms.find(p => p.permission.id === perm.id) || { permission: perm, granted: false };
                     return (
                       <div key={perm} className="permission-item">
                         <div className="permission-info">
                           <div className="permission-icon">
-                            {getPermissionIcon(perm)}
+                            {getPermissionIcon(perm.name)}
                           </div>
-                          <span className="permission-label">{perm}</span>
+                          <span className="permission-label">{perm.name}</span>
                         </div>
                         <button
                           className={`toggle-switch ${userPerm.granted ? 'active' : ''}`}
                           onClick={() => updatePermission(perm, !userPerm.granted)}
-                          aria-label={`Toggle ${perm} permission`}
+                          aria-label={`Toggle ${perm.name} permission`}
                         />
                       </div>
                     );
